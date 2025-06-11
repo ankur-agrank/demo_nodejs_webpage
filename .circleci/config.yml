@@ -12,20 +12,16 @@ jobs:
   build_docker_image:
     docker:
       - image: circleci/node:12
-            steps:
-              - checkout
-              - run:
-                  name: Login to Docker Registry
-                  command: |
-                    docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
-              - run:
-                  name: Build and Tag Docker Image
-                  command: |
-                    docker build -t $DOCKER_LOGIN/nodejswebapp:latest .
-              - run:
-                  name: Push Docker Image
-                  command: |
-                    docker push $DOCKER_LOGIN/nodejswebapp:latest
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t nodejswebapp -t agrank/nodejswebapp:latest .
+            echo $DOCKER_PASSWORD | docker login -u agrank --password-stdin
+            docker push agrank/nodejswebapp:latest
 
 workflows:
   build_test:
